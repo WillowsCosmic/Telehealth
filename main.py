@@ -22,17 +22,22 @@ load_dotenv(".env.local")
 warnings.filterwarnings("ignore", category=UserWarning)
 
 app = FastAPI(title="TeleHealth-OCR Backend")
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-# Enable CORS for Member A's frontend
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",  
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+]
+
+# Add production URL if provided
+if os.getenv("FRONTEND_URL"):
+    origins.append(os.getenv("FRONTEND_URL"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:8000",
-        "*"
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
