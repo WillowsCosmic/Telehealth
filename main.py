@@ -13,28 +13,28 @@ import warnings
 import urllib.parse
 import time
 from google.genai import errors
-import os
 from dotenv import load_dotenv
 
 # Load explicitly from .env.local
-load_dotenv(".env.local")
+load_dotenv()
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
 app = FastAPI(title="TeleHealth-OCR Backend")
-frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
-
 origins = [
     "http://localhost:3000",
     "http://localhost:5173",  
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
-    "https://telehealth-frontend-cyan.vercel.app",
+    "https://telehealth-frontend-cyan.vercel.app",  # Production Vercel domain
 ]
 
-# Add production URL if provided
-if os.getenv("FRONTEND_URL"):
-    origins.append(os.getenv("FRONTEND_URL"))
+# Cleanly read FRONTEND_URL if set in Render dashboard
+env_frontend_url = os.getenv("FRONTEND_URL")
+if env_frontend_url:
+    clean_url = env_frontend_url.strip().rstrip("/")
+    if clean_url not in origins:
+        origins.append(clean_url)
 
 app.add_middleware(
     CORSMiddleware,
